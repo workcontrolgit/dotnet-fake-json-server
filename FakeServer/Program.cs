@@ -24,15 +24,27 @@ namespace FakeServer
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
-            var config = new ConfigurationBuilder()
-                       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                       .AddJsonFile($"appsettings.{env}.json", optional: true)
-                       .AddJsonFile("authentication.json", optional: true, reloadOnChange: true)
-                       .AddInMemoryCollection(initialData)
-                       .AddEnvironmentVariables()
-                       .Build();
+            IConfigurationRoot config;
 
-            if (!isConfigValid(config))
+            try
+            {
+                config = new ConfigurationBuilder()
+                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                         .AddJsonFile($"appsettings.{env}.json", optional: true)
+                         .AddJsonFile("authentication.json", optional: true, reloadOnChange: true)
+                         .AddInMemoryCollection(initialData)
+                         .AddEnvironmentVariables()
+                         .Build();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nConfiguration file is not valid");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Program will exit...");
+                return 1;
+            }
+           
+            if (!IsConfigValid(config))
             {
                 Console.WriteLine("\nUpdate appsettings.json to latest version");
                 Console.WriteLine("Program will exit...");
@@ -66,12 +78,15 @@ namespace FakeServer
             .UseStartup<Startup>()
             .UseSerilog();
             
-        private static bool isConfigValid(IConfigurationRoot config) => config["DataStore:IdField"] == null ? false : true;
+        private static bool IsConfigValid(IConfigurationRoot config) => config["DataStore:IdField"] != null;
 
         private static CommandLineApplication BuildCommandLineApp(
             Func<string[], Dictionary<string, string>, int> invoke)
         {
-            var app = new CommandLineApplication(throwOnUnexpectedArg: false);
+            var app = new CommandLineApplication 
+            {
+                UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.StopParsingAndCollect
+            };
             app.HelpOption();
 
             var optionVersion = app.Option("--version", "Prints the version of the app", CommandOptionType.NoValue);
