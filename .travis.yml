@@ -1,10 +1,9 @@
 language: csharp
-dist: bionic
-sudo: required
+os: linux
+dist: focal
 mono: none
-dotnet: 3.1.100
+dotnet: 6.0.404
 solution: FakeServer.sln
 script:
   - dotnet restore
   - dotnet build
-  - dotnet test FakeServer.Test/FakeServer.Test.csproj

@@ -1,16 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿namespace FakeServer.Jobs;
 
-namespace FakeServer.Jobs
+public class Job
 {
-    public class Job
-    {
-        public string Collection { get; set; }
+    public string Collection { get; set; }
 
-        public Task<dynamic> Action { get; set; }
-    }
+    public Task<dynamic> Action { get; set; }
+}
 
-    public class JobsSettings
-    {
-        public int DelayMs { get; set; }
-    }
+public class JobsSettings
+{
+    public int DelayMs { get; set; }
 }

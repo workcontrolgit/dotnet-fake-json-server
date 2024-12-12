@@ -1,6 +1,17 @@
 # Changelog
 
 ### [Unreleased]
+* FIXED: Return 404 for merge patch if item not found
+* ADDED: JsonPatch support for PATCH endpoints
+* CHANGED: Target framework to .NET 6
+* FIEXD: Async JsonPatch endpoint
+
+### [0.11.0] - 2022-05-17
+* FIXED: Basic Authentication unauthorized result
+* ADDED: API key authentication
+* CHANGED: For empty collections return 200 status code instead of 404
+* FIXED: Swagger authentication
+* CHANGED: Target framework to .NET 5
 * CHANGED: PATCH methods to require Content-Type: application/json+merge-patch or merge-patch+json
 * ADDED: Content negotiation with Accept-header and support for CSV and XML
 * ADDED: Client Credentials support to token authentication
@@ -15,7 +26,7 @@
 * CHANGED: Rename Common property from appsettings.json to DataStore
 * CHANGED: Remove authentication.json and add Authentication settings to appsettings.json
 * ADDED: GraphQL endpoint to support operations in query parameter
-* ADDED: Configurable response transfrom middleware
+* ADDED: Configurable response transform middleware
 
 ### [0.9.1] - 2019-02-08
 * CHANGED: Target framework to .NET Core 2.2

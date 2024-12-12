@@ -1,34 +1,29 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Options;
 
-namespace FakeServer.Simulate
+namespace FakeServer.Simulate;
+
+public class ErrorMiddleware
 {
-    public class ErrorMiddleware
+    private readonly ErrorSettings _settings;
+    private readonly RequestDelegate _next;
+    private readonly string[] _skipWords = { ".html", ".ico", "swagger", "ws" };
+
+    public ErrorMiddleware(RequestDelegate next, IOptions<SimulateSettings> settings)
     {
-        private readonly ErrorSettings _settings;
-        private readonly RequestDelegate _next;
-        private readonly string[] _skipwords = new string[] { ".html", ".ico", "swagger", "ws" };
+        _next = next;
+        _settings = settings.Value.Error;
+    }
 
-        public ErrorMiddleware(RequestDelegate next, IOptions<SimulateSettings> settings)
+    public async Task Invoke(HttpContext context)
+    {
+        var skipCheck = context.Request.Path == "/" || _skipWords.Any(context.Request.Path.ToString().ToLower().Contains);
+
+        if (!skipCheck && _settings.Methods.Contains(context.Request.Method))
         {
-            _next = next;
-            _settings = settings.Value.Error;
+            if (_settings.Probability >= new Random().Next(1, 100))
+                throw new Exception("ErrorMiddleware");
         }
 
-        public async Task Invoke(HttpContext context)
-        {
-            bool skipCheck = context.Request.Path == "/" || _skipwords.Any(context.Request.Path.ToString().ToLower().Contains);
-
-            if (!skipCheck && _settings.Methods.Contains(context.Request.Method))
-            {
-                if (_settings.Probability >= new Random().Next(1, 100))
-                    throw new Exception("ErrorMiddleware");
-            }
-
-            await _next(context);
-        }
+        await _next(context);
     }
 }
